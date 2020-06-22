@@ -1,4 +1,4 @@
-package com.siyun;
+package com.supexapps.siyun;
 
 import com.facebook.react.ReactActivity;
 

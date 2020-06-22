@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "449176859819",
+    "firebase_url": "https://siyun-78f8a.firebaseio.com",
+    "project_id": "siyun-78f8a",
+    "storage_bucket": "siyun-78f8a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449176859819:android:262ca3fb6251aa666eb3ee",
+        "android_client_info": {
+          "package_name": "com.supexapps.siyun"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "449176859819-vlit9l7r8j8rqrgekjsu1rkv06hfj443.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAimEtL-CF6hJMlTSdFw8utRJoSeI_tMK0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "449176859819-vlit9l7r8j8rqrgekjsu1rkv06hfj443.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
