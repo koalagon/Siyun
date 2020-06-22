@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, Button, Image} from 'react-native';
+import {Text, Button, Image, Dimensions} from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import {TextInput} from 'react-native-gesture-handler';
 import storage from '@react-native-firebase/storage';
@@ -15,9 +15,12 @@ const options = {
 
 interface IState {
   imagePath: string;
+  imageWidth: number;
+  imageHeight: number;
   description: string;
   selectedIndex: number;
   user: any;
+  screenWidth: number;
 }
 
 export default class CreateDrawingScreen extends React.Component<any, IState> {
@@ -25,15 +28,23 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
     super(props);
     this.state = {
       imagePath: '',
+      imageWidth: 0,
+      imageHeight: 0,
       description: '',
       selectedIndex: 0,
       user: null,
+      screenWidth: Dimensions.get('window').width,
     };
   }
 
   componentDidMount() {
     this.props.navigation.addListener('focus', () => {
       this.setState({user: firebase.auth().currentUser});
+    });
+
+    Dimensions.addEventListener('change', () => {
+      const screenWidth = Dimensions.get('window').width;
+      this.setState({screenWidth});
     });
   }
 
@@ -48,7 +59,14 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
       } else {
-        //const source = {uri: response.uri};
+        const {width, height} = response;
+        if (width > this.state.screenWidth) {
+          const ratio = this.state.screenWidth / width;
+          this.setState({imageWidth: width, imageHeight: height * ratio});
+        } else {
+          this.setState({imageWidth: width, imageHeight: height});
+        }
+
         this.setState({imagePath: 'file://' + response.path});
       }
     });
@@ -101,7 +119,10 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
           this.state.imagePath ? (
             <>
               <Image
-                style={{width: 500, height: 400}}
+                style={{
+                  width: this.state.imageWidth,
+                  height: this.state.imageHeight,
+                }}
                 source={{uri: this.state.imagePath}}
               />
               <SegmentedControlTab
