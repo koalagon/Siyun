@@ -22,7 +22,7 @@ export default class BottomTabs extends React.Component<any> {
           }}
         />
         <Tab.Screen
-          name="NewPost"
+          name="CreatePost"
           component={CreatePost}
           options={{
             tabBarLabel: 'New Post',

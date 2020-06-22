@@ -3,7 +3,9 @@ import {Text, Button, Image} from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import {TextInput} from 'react-native-gesture-handler';
 import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
 import {firebase} from '@react-native-firebase/auth';
+import SegmentedControlTab from 'react-native-segmented-control-tab';
 
 const options = {
   storageOptions: {
@@ -13,6 +15,9 @@ const options = {
 
 interface IState {
   imagePath: string;
+  description: string;
+  selectedIndex: number;
+  user: any;
 }
 
 export default class CreateDrawingScreen extends React.Component<any, IState> {
@@ -20,10 +25,19 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
     super(props);
     this.state = {
       imagePath: '',
+      description: '',
+      selectedIndex: 0,
+      user: null,
     };
   }
 
-  pickImage() {
+  componentDidMount() {
+    this.props.navigation.addListener('focus', () => {
+      this.setState({user: firebase.auth().currentUser});
+    });
+  }
+
+  chooseImage() {
     ImagePicker.launchImageLibrary(options, (response) => {
       console.log('Response = ', response);
 
@@ -55,37 +69,72 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
       .putFile(this.state.imagePath)
       .catch((error) => console.log(error));
 
-    const url = await reference.getDownloadURL();
-    console.log(url);
+    const downloadUrl = await reference.getDownloadURL();
 
-    this.props.navigation.navigate('Home');
+    firestore()
+      .collection('posts')
+      .add({
+        imageUrl: downloadUrl,
+        description: this.state.description,
+        isPublic: this.state.selectedIndex === 0,
+        dateCreated: new Date(),
+        userId: firebase.auth().currentUser?.uid,
+      })
+      .then(() => {
+        console.log('Post added!');
+        this.setState({imagePath: '', description: '', selectedIndex: 0});
+        this.props.navigation.navigate('Home');
+      });
   }
+
+  handleIndexChange = (index: number) => {
+    this.setState({
+      ...this.state,
+      selectedIndex: index,
+    });
+  };
 
   render() {
     return (
       <>
-        {this.state.imagePath ? (
-          <>
-            <Image
-              style={{width: 500, height: 400}}
-              source={{uri: this.state.imagePath}}
-            />
-            <Text>Private/Public</Text>
-            <TextInput
-              multiline={true}
-              numberOfLines={8}
-              placeholder="Description"
-            />
-            <Button
-              onPress={async () => await this.uploadImage()}
-              title="Post"
-            />
-          </>
+        {this.state.user ? (
+          this.state.imagePath ? (
+            <>
+              <Image
+                style={{width: 500, height: 400}}
+                source={{uri: this.state.imagePath}}
+              />
+              <SegmentedControlTab
+                values={['Public', 'Private']}
+                selectedIndex={this.state.selectedIndex}
+                onTabPress={this.handleIndexChange}
+              />
+              <TextInput
+                multiline={true}
+                numberOfLines={8}
+                placeholder="Description"
+                onChangeText={(description) => this.setState({description})}
+                value={this.state.description}
+              />
+              <Button
+                onPress={async () => await this.uploadImage()}
+                title="Post"
+              />
+            </>
+          ) : (
+            <>
+              <Button
+                onPress={() => this.chooseImage()}
+                title="Pick your drawing"
+              />
+            </>
+          )
         ) : (
           <>
+            <Text>Sign in!</Text>
             <Button
-              onPress={() => this.pickImage()}
-              title="Pick your drawing"
+              title="Sign In"
+              onPress={() => this.props.navigation.navigate('Signin')}
             />
           </>
         )}
