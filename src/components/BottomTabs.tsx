@@ -1,7 +1,7 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Home from '../screens/HomeScreen';
-import CreateDrwaing from '../screens/drawings/CreateScreen';
+import CreatePost from '../screens/posts/CreateScreen';
 import Profile from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
@@ -22,10 +22,10 @@ export default class BottomTabs extends React.Component<any> {
           }}
         />
         <Tab.Screen
-          name="NewDrawing"
-          component={CreateDrwaing}
+          name="NewPost"
+          component={CreatePost}
           options={{
-            tabBarLabel: 'New Drawing',
+            tabBarLabel: 'New Post',
           }}
         />
         <Tab.Screen
