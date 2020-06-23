@@ -1,11 +1,12 @@
 import React from 'react';
 import {Text, Button, Image, Dimensions} from 'react-native';
 import ImagePicker from 'react-native-image-picker';
-import {TextInput} from 'react-native-gesture-handler';
+import {TextInput, ScrollView} from 'react-native-gesture-handler';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import {firebase} from '@react-native-firebase/auth';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 const options = {
   storageOptions: {
@@ -17,6 +18,8 @@ interface IState {
   imagePath: string;
   imageWidth: number;
   imageHeight: number;
+  originalWidth: number;
+  originalHeight: number;
   description: string;
   selectedIndex: number;
   user: any;
@@ -30,6 +33,8 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
       imagePath: '',
       imageWidth: 0,
       imageHeight: 0,
+      originalWidth: 0,
+      originalHeight: 0,
       description: '',
       selectedIndex: 0,
       user: null,
@@ -60,9 +65,13 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
         console.log('User tapped custom button: ', response.customButton);
       } else {
         const {width, height} = response;
+        this.setState({originalWidth: width, originalHeight: height});
         if (width > this.state.screenWidth) {
           const ratio = this.state.screenWidth / width;
-          this.setState({imageWidth: width, imageHeight: height * ratio});
+          this.setState({
+            imageWidth: this.state.screenWidth,
+            imageHeight: height * ratio,
+          });
         } else {
           this.setState({imageWidth: width, imageHeight: height});
         }
@@ -97,11 +106,13 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
         isPublic: this.state.selectedIndex === 0,
         dateCreated: new Date(),
         userId: firebase.auth().currentUser?.uid,
+        width: this.state.originalWidth,
+        height: this.state.originalHeight,
       })
       .then(() => {
         console.log('Post added!');
         this.setState({imagePath: '', description: '', selectedIndex: 0});
-        this.props.navigation.navigate('Home');
+        this.props.navigation.navigate('Home', {refresh: true});
       });
   }
 
@@ -117,31 +128,33 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
       <>
         {this.state.user ? (
           this.state.imagePath ? (
-            <>
-              <Image
-                style={{
-                  width: this.state.imageWidth,
-                  height: this.state.imageHeight,
-                }}
-                source={{uri: this.state.imagePath}}
-              />
-              <SegmentedControlTab
-                values={['Public', 'Private']}
-                selectedIndex={this.state.selectedIndex}
-                onTabPress={this.handleIndexChange}
-              />
-              <TextInput
-                multiline={true}
-                numberOfLines={8}
-                placeholder="Description"
-                onChangeText={(description) => this.setState({description})}
-                value={this.state.description}
-              />
-              <Button
-                onPress={async () => await this.uploadImage()}
-                title="Post"
-              />
-            </>
+            <SafeAreaView style={{flex: 1}}>
+              <ScrollView>
+                <Image
+                  style={{
+                    width: this.state.imageWidth,
+                    height: this.state.imageHeight,
+                  }}
+                  source={{uri: this.state.imagePath}}
+                />
+                <SegmentedControlTab
+                  values={['Public', 'Private']}
+                  selectedIndex={this.state.selectedIndex}
+                  onTabPress={this.handleIndexChange}
+                />
+                <TextInput
+                  multiline={true}
+                  numberOfLines={8}
+                  placeholder="Description"
+                  onChangeText={(description) => this.setState({description})}
+                  value={this.state.description}
+                />
+                <Button
+                  onPress={async () => await this.uploadImage()}
+                  title="Post"
+                />
+              </ScrollView>
+            </SafeAreaView>
           ) : (
             <>
               <Button
