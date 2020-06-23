@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, Button, Image, Dimensions} from 'react-native';
+import {Text, Button, Image, Dimensions, View, StyleSheet} from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import {TextInput, ScrollView} from 'react-native-gesture-handler';
 import storage from '@react-native-firebase/storage';
@@ -7,6 +7,7 @@ import firestore from '@react-native-firebase/firestore';
 import {firebase} from '@react-native-firebase/auth';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import PostButton from '../../components/PostButton';
 
 const options = {
   storageOptions: {
@@ -26,7 +27,7 @@ interface IState {
   screenWidth: number;
 }
 
-export default class CreateDrawingScreen extends React.Component<any, IState> {
+export default class CreateScreen extends React.Component<any, IState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -40,11 +41,13 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
       user: null,
       screenWidth: Dimensions.get('window').width,
     };
-  }
 
-  componentDidMount() {
     this.props.navigation.addListener('focus', () => {
       this.setState({user: firebase.auth().currentUser});
+    });
+
+    this.props.navigation.addListener('blur', () => {
+      this.setState({description: '', selectedIndex: 0, imagePath: ''});
     });
 
     Dimensions.addEventListener('change', () => {
@@ -52,6 +55,8 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
       this.setState({screenWidth});
     });
   }
+
+  componentDidMount() {}
 
   chooseImage() {
     ImagePicker.launchImageLibrary(options, (response) => {
@@ -105,7 +110,8 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
         description: this.state.description,
         isPublic: this.state.selectedIndex === 0,
         dateCreated: new Date(),
-        userId: firebase.auth().currentUser?.uid,
+        userId: this.state.user.uid,
+        displayName: this.state.user.displayName,
         width: this.state.originalWidth,
         height: this.state.originalHeight,
       })
@@ -128,7 +134,7 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
       <>
         {this.state.user ? (
           this.state.imagePath ? (
-            <SafeAreaView style={{flex: 1}}>
+            <SafeAreaView>
               <ScrollView>
                 <Image
                   style={{
@@ -137,42 +143,71 @@ export default class CreateDrawingScreen extends React.Component<any, IState> {
                   }}
                   source={{uri: this.state.imagePath}}
                 />
-                <SegmentedControlTab
-                  values={['Public', 'Private']}
-                  selectedIndex={this.state.selectedIndex}
-                  onTabPress={this.handleIndexChange}
-                />
-                <TextInput
-                  multiline={true}
-                  numberOfLines={8}
-                  placeholder="Description"
-                  onChangeText={(description) => this.setState({description})}
-                  value={this.state.description}
-                />
-                <Button
-                  onPress={async () => await this.uploadImage()}
-                  title="Post"
-                />
+                <View style={[styles.padding10, styles.marginTop15]}>
+                  <SegmentedControlTab
+                    values={['Public', 'Private']}
+                    selectedIndex={this.state.selectedIndex}
+                    onTabPress={this.handleIndexChange}
+                    activeTabStyle={{backgroundColor: '#2196f3'}}
+                  />
+                  <View style={[styles.row, styles.marginTop15]}>
+                    <TextInput
+                      placeholder="Description"
+                      onChangeText={(description) =>
+                        this.setState({description})
+                      }
+                      value={this.state.description}
+                      style={[
+                        styles.descInput,
+                        {width: this.state.screenWidth - 90},
+                      ]}
+                    />
+                    <PostButton
+                      onPress={async () => await this.uploadImage()}
+                    />
+                  </View>
+                </View>
               </ScrollView>
             </SafeAreaView>
           ) : (
-            <>
+            <View style={[styles.padding10, {marginTop: 50}]}>
               <Button
                 onPress={() => this.chooseImage()}
                 title="Pick your drawing"
               />
-            </>
+            </View>
           )
         ) : (
           <>
-            <Text>Sign in!</Text>
-            <Button
-              title="Sign In"
-              onPress={() => this.props.navigation.navigate('Signin')}
-            />
+            <View>
+              <Text>Sign in!</Text>
+              <Button
+                title="Sign In"
+                onPress={() => this.props.navigation.navigate('Signin')}
+              />
+            </View>
           </>
         )}
       </>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+  },
+  padding10: {
+    padding: 10,
+  },
+  marginTop15: {
+    marginTop: 15,
+  },
+  descInput: {
+    borderColor: '#eee',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingTop: 5,
+    paddingBottom: 5,
+  },
+});

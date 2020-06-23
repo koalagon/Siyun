@@ -1,21 +1,21 @@
 import React from 'react';
-import {Text, Button, Image, View, Dimensions} from 'react-native';
+import {
+  Text,
+  Button,
+  Image,
+  View,
+  Dimensions,
+  FlatList,
+  RefreshControl,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {ScrollView, FlatList} from 'react-native-gesture-handler';
-import firestore from '@react-native-firebase/firestore';
+import firestore, {firebase} from '@react-native-firebase/firestore';
+import IPost from '../models/IPost';
+import IFeedback from '../models/IFeedback';
 
 interface IState {
   posts: Array<IPost>;
-}
-
-interface IPost {
-  id: string;
-  imageUrl: string;
-  width: number;
-  height: number;
-  description: string;
-  dateCreated: string;
-  nickname: string;
+  refreshing: boolean;
 }
 
 const screenWidth = Dimensions.get('window').width;
@@ -25,17 +25,20 @@ export default class HomeScreen extends React.Component<any, IState> {
     super(props);
     this.state = {
       posts: [],
+      refreshing: false,
     };
 
     this.props.navigation.addListener('focus', () => {
       const refresh = this.props.route.params?.refresh;
       if (refresh) {
+        this.props.navigation.setParams({refresh: false});
         this.setState({posts: []}, this.fetchPosts);
       }
     });
   }
 
   componentDidMount() {
+    console.log('component mounted');
     this.fetchPosts();
   }
 
@@ -47,21 +50,36 @@ export default class HomeScreen extends React.Component<any, IState> {
       .orderBy('dateCreated', 'desc')
       .get()
       .then((querySnapshot) => {
-        console.log(querySnapshot);
+        //console.log(querySnapshot);
+        let posts: Array<IPost> = [];
+
         querySnapshot.forEach((documentSnapshot) => {
+          const data = documentSnapshot.data();
           const post: IPost = {
             id: documentSnapshot.id,
-            imageUrl: documentSnapshot.data().imageUrl,
-            width: documentSnapshot.data().width,
-            height: documentSnapshot.data().height,
-            description: documentSnapshot.data().description,
-            dateCreated: documentSnapshot.data().dateCreated,
-            nickname: 'Siyun',
+            imageUrl: data.imageUrl,
+            width: data.width,
+            height: data.height,
+            description: data.description,
+            dateCreated: data.dateCreated,
+            displayName: data.displayName,
+            userId: data.userId,
+            feedbacks: data.feedbacks,
           };
           console.log('post: ', post);
-          this.setState({posts: [...this.state.posts, post]});
+          posts.push(post);
         });
+
+        this.setState({posts});
       });
+  }
+
+  feedback(postId: string, feedbacks: Array<IFeedback>) {
+    if (firebase.auth().currentUser) {
+      this.props.navigation.navigate('CreateFeedback', {postId, feedbacks});
+    } else {
+      this.props.navigation.navigate('Signin');
+    }
   }
 
   renderItem(item: IPost) {
@@ -72,15 +90,43 @@ export default class HomeScreen extends React.Component<any, IState> {
 
     return (
       <View style={{backgroundColor: 'white', marginBottom: 15}}>
-        <Text style={{padding: padding}}>{item.nickname}</Text>
+        <Text style={{padding: padding}}>{item.displayName}</Text>
         <Image
           source={{uri: item.imageUrl}}
           style={{width: width, height: height}}
         />
-        <Text style={{padding: padding}}>{item.description}</Text>
+        <View style={{padding: padding}}>
+          <Text>{item.description}</Text>
+          <View>
+            <Text>
+              Avg Rate:{' '}
+              {item.feedbacks != null
+                ? (
+                    item.feedbacks.reduce(
+                      (total, next) => total + next.rating,
+                      0,
+                    ) / item.feedbacks.length
+                  ).toFixed(1)
+                : 'N/A'}
+            </Text>
+            <Text>
+              Feedbacks: {item.feedbacks == null ? 0 : item.feedbacks.length}
+            </Text>
+            <Button
+              title="Comment & Rate"
+              onPress={() => this.feedback(item.id, item.feedbacks)}
+            />
+          </View>
+        </View>
       </View>
     );
   }
+
+  onRefresh = () => {
+    this.setState({refreshing: true});
+    this.fetchPosts();
+    this.setState({refreshing: false});
+  };
 
   render() {
     return (
@@ -90,6 +136,12 @@ export default class HomeScreen extends React.Component<any, IState> {
           data={this.state.posts}
           renderItem={({item}) => this.renderItem(item)}
           keyExtractor={(item) => item.id}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this.onRefresh}
+            />
+          }
         />
       </SafeAreaView>
     );

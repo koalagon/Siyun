@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text} from 'react-native';
 
-export default class EditDrawingScreen extends React.Component<any> {
+export default class EditScreen extends React.Component<any> {
   constructor(props: any) {
     super(props);
   }

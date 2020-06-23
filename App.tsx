@@ -1,15 +1,24 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import BottomTabs from './src/components/BottomTabs';
 import Signin from './src/screens/SigninScreen';
 import Signup from './src/screens/SignupScreen';
 import Profile from './src/screens/ProfileScreen';
+import CreateFeedback from './src/screens/feedbacks/CreateScreen';
 import {firebase} from '@react-native-firebase/auth';
 
 const Stack = createStackNavigator();
 let unsubscribe: any;
+
+const theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: 'white',
+  },
+};
 
 export default class App extends React.Component<any> {
   constructor(props: any) {
@@ -33,7 +42,7 @@ export default class App extends React.Component<any> {
 
   render() {
     return (
-      <NavigationContainer>
+      <NavigationContainer theme={theme}>
         <Stack.Navigator>
           <Stack.Screen
             name="BottomTabs"
@@ -60,7 +69,15 @@ export default class App extends React.Component<any> {
             name="Profile"
             component={Profile}
             options={{
-              headerShown: false,
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen
+            name="CreateFeedback"
+            component={CreateFeedback}
+            options={{
+              headerShown: true,
+              headerTitle: 'Feedback',
             }}
           />
         </Stack.Navigator>
