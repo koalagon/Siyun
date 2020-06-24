@@ -179,12 +179,14 @@ export default class CreateScreen extends React.Component<any, IState> {
           )
         ) : (
           <>
-            <View>
-              <Text>Sign in!</Text>
-              <Button
-                title="Sign In"
-                onPress={() => this.props.navigation.navigate('Signin')}
-              />
+            <View style={styles.container}>
+              <Text>You need to sign in in order to post your drawing.</Text>
+              <View style={styles.marginTop15}>
+                <Button
+                  title="Sign In"
+                  onPress={() => this.props.navigation.navigate('Signin')}
+                />
+              </View>
             </View>
           </>
         )}
@@ -194,6 +196,10 @@ export default class CreateScreen extends React.Component<any, IState> {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    padding: 10,
+    paddingTop: 30,
+  },
   row: {
     flexDirection: 'row',
   },

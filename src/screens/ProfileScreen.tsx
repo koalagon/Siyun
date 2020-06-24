@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, Button} from 'react-native';
+import {Text, Button, StyleSheet, View} from 'react-native';
 import auth, {firebase} from '@react-native-firebase/auth';
 
 interface IState {
@@ -31,22 +31,36 @@ export default class ProfileScreen extends React.Component<any, IState> {
 
   render() {
     return (
-      <>
+      <View style={styles.container}>
         {this.state.user ? (
           <>
-            <Text>Hello {this.state.user?.displayName}</Text>
+            <Text style={styles.marginBottom15}>
+              Hello {this.state.user?.displayName}
+            </Text>
             <Button onPress={() => this.signout()} title="Sign Out" />
           </>
         ) : (
           <>
-            <Text>You are not logged in. Please sign in!</Text>
+            <Text style={styles.marginBottom15}>
+              You are not logged in. Please sign in.
+            </Text>
             <Button
               title="Sign In"
               onPress={() => this.props.navigation.navigate('Signin')}
             />
           </>
         )}
-      </>
+      </View>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 10,
+    paddingTop: 30,
+  },
+  marginBottom15: {
+    marginBottom: 15,
+  },
+});

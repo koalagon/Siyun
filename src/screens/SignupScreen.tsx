@@ -1,7 +1,7 @@
 import auth, {firebase} from '@react-native-firebase/auth';
 import React from 'react';
 import {TextInput} from 'react-native-gesture-handler';
-import {Button, Alert} from 'react-native';
+import {Button, Alert, StyleSheet, View} from 'react-native';
 
 interface IState {
   email: string;
@@ -20,6 +20,10 @@ export default class SignupScreen extends React.Component<any, IState> {
   }
 
   signup() {
+    if (!this.state.email || !this.state.password || !this.state.nickname) {
+      return;
+    }
+
     auth()
       .createUserWithEmailAndPassword(this.state.email, this.state.password)
       .then(() => {
@@ -42,31 +46,60 @@ export default class SignupScreen extends React.Component<any, IState> {
           Alert.alert('That email address is invalid!');
         }
 
-        console.error(error);
+        if (error.code === 'auth/weak-password') {
+          Alert.alert('Password should be at least 6 characters!');
+        }
+
+        console.log(error);
       });
   }
 
   render() {
     return (
-      <>
+      <View style={styles.container}>
         <TextInput
+          textContentType="emailAddress"
+          autoCompleteType="email"
           placeholder="Email"
           autoCapitalize="none"
           onChangeText={(email) => this.setState({email})}
+          value={this.state.email}
+          style={[styles.input, styles.formGroup]}
         />
         <TextInput
           placeholder="Password"
           autoCapitalize="none"
           secureTextEntry={true}
           onChangeText={(password) => this.setState({password})}
+          value={this.state.password}
+          style={[styles.input, styles.formGroup]}
         />
         <TextInput
           placeholder="Nickname"
           autoCapitalize="none"
           onChangeText={(nickname) => this.setState({nickname})}
+          value={this.state.nickname}
+          style={[styles.input, styles.formGroup]}
         />
         <Button onPress={() => this.signup()} title="Sign Up" />
-      </>
+      </View>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 10,
+    paddingTop: 30,
+  },
+  formGroup: {
+    marginBottom: 10,
+  },
+  input: {
+    borderRadius: 5,
+    borderColor: '#eee',
+    borderWidth: 1,
+    paddingTop: 5,
+    paddingBottom: 5,
+  },
+});
