@@ -3,7 +3,6 @@ import {TextInput} from 'react-native-gesture-handler';
 import {
   Text,
   FlatList,
-  KeyboardAvoidingView,
   View,
   StyleSheet,
   Dimensions,
@@ -66,15 +65,7 @@ export default class CreateScreen extends React.Component<any, IState> {
   renderItem(item: IFeedback) {
     return (
       <>
-        <View
-          style={{
-            borderBottomColor: '#eee',
-            borderBottomWidth: 1,
-            paddingBottom: 7,
-            paddingTop: 7,
-            paddingLeft: 15,
-            paddingRight: 15,
-          }}>
+        <View style={styles.feedbackItem}>
           <View style={styles.row}>
             <Text style={{fontWeight: '700'}}>{item.displayName}</Text>
             <AirbnbRating
@@ -138,5 +129,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingTop: 5,
     paddingBottom: 5,
+  },
+  feedbackItem: {
+    borderBottomColor: '#eee',
+    borderBottomWidth: 1,
+    paddingBottom: 7,
+    paddingTop: 7,
+    paddingLeft: 15,
+    paddingRight: 15,
   },
 });

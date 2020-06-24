@@ -91,12 +91,7 @@ export default class HomeScreen extends React.Component<any, IState> {
 
     return (
       <>
-        <View
-          style={{
-            backgroundColor: 'white',
-            borderBottomColor: '#ddd',
-            borderBottomWidth: 15,
-          }}>
+        <View style={styles.postContainer}>
           <Text style={styles.nickname}>{item.displayName}</Text>
           <Text style={{paddingLeft: 15, paddingBottom: 10}}>
             {new Date(item.dateCreated._seconds * 1000).toISOString()}
@@ -110,18 +105,8 @@ export default class HomeScreen extends React.Component<any, IState> {
             <TouchableOpacity
               activeOpacity={0.5}
               onPress={() => this.feedback(item.id, item.feedbacks)}>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  padding: 15,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  borderTopWidth: 1,
-                  borderTopColor: '#eee',
-                  marginTop: 15,
-                }}>
-                <View style={{flex: 1, flexDirection: 'row'}}>
+              <View style={styles.postFooter}>
+                <View style={styles.row}>
                   <Icon name="staro" size={16} />
                   <Text style={{fontSize: 16, paddingLeft: 5, marginTop: -3}}>
                     {item.feedbacks != null
@@ -134,7 +119,7 @@ export default class HomeScreen extends React.Component<any, IState> {
                       : 'N/A'}
                   </Text>
                 </View>
-                <View style={{flex: 1, flexDirection: 'row'}}>
+                <View style={styles.row}>
                   <Icon name="message1" size={16} />
                   <Text style={{fontSize: 16, paddingLeft: 5, marginTop: -3}}>
                     {(item.feedbacks == null ? 0 : item.feedbacks.length) +
@@ -187,5 +172,21 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     paddingTop: 10,
     fontSize: 16,
+  },
+  row: {flex: 1, flexDirection: 'row'},
+  postContainer: {
+    backgroundColor: 'white',
+    borderBottomColor: '#ddd',
+    borderBottomWidth: 15,
+  },
+  postFooter: {
+    flex: 1,
+    flexDirection: 'row',
+    padding: 15,
+    paddingTop: 10,
+    paddingBottom: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    marginTop: 15,
   },
 });

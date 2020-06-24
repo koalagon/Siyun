@@ -71,7 +71,7 @@ export default class CreateScreen extends React.Component<any, IState> {
 
   chooseImage() {
     ImagePicker.launchImageLibrary(options, (response) => {
-      console.log('Response = ', response);
+      //console.log('Response = ', response);
 
       if (response.didCancel) {
         console.log('User cancelled image picker');
