@@ -1,5 +1,13 @@
 import React from 'react';
-import {Text, Button, Image, Dimensions, View, StyleSheet} from 'react-native';
+import {
+  Text,
+  Button,
+  Image,
+  Dimensions,
+  View,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import {TextInput, ScrollView} from 'react-native-gesture-handler';
 import storage from '@react-native-firebase/storage';
@@ -8,6 +16,7 @@ import {firebase} from '@react-native-firebase/auth';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import PostButton from '../../components/PostButton';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const options = {
   storageOptions: {
@@ -25,6 +34,7 @@ interface IState {
   selectedIndex: number;
   user: any;
   screenWidth: number;
+  isUploading: boolean;
 }
 
 export default class CreateScreen extends React.Component<any, IState> {
@@ -40,6 +50,7 @@ export default class CreateScreen extends React.Component<any, IState> {
       selectedIndex: 0,
       user: null,
       screenWidth: Dimensions.get('window').width,
+      isUploading: false,
     };
 
     this.props.navigation.addListener('focus', () => {
@@ -87,14 +98,14 @@ export default class CreateScreen extends React.Component<any, IState> {
   }
 
   async uploadImage() {
+    this.setState({isUploading: true});
+
     const uid = firebase.auth().currentUser?.uid;
     const imagePath = this.state.imagePath;
-    console.log(imagePath);
     const filename = `/${uid}/${imagePath.substring(
       imagePath.lastIndexOf('/') + 1,
     )}`;
 
-    console.log(filename);
     const reference = storage().ref(filename);
     // uploads file
     await reference
@@ -117,8 +128,17 @@ export default class CreateScreen extends React.Component<any, IState> {
       })
       .then(() => {
         console.log('Post added!');
-        this.setState({imagePath: '', description: '', selectedIndex: 0});
+        this.setState({
+          imagePath: '',
+          description: '',
+          selectedIndex: 0,
+          isUploading: false,
+        });
         this.props.navigation.navigate('Home', {refresh: true});
+      })
+      .catch(() => {
+        this.setState({isUploading: false});
+        Alert.alert('Error occured while uploading the image');
       });
   }
 
@@ -136,6 +156,11 @@ export default class CreateScreen extends React.Component<any, IState> {
           this.state.imagePath ? (
             <SafeAreaView>
               <ScrollView>
+                <Spinner
+                  visible={this.state.isUploading}
+                  textContent={'Uploading...'}
+                  textStyle={{color: '#fff'}}
+                />
                 <Image
                   style={{
                     width: this.state.imageWidth,
@@ -152,7 +177,8 @@ export default class CreateScreen extends React.Component<any, IState> {
                   />
                   <View style={[styles.row, styles.marginTop15]}>
                     <TextInput
-                      placeholder="Description"
+                      placeholder="Describe your drawing..."
+                      maxLength={1000}
                       onChangeText={(description) =>
                         this.setState({description})
                       }
@@ -173,7 +199,7 @@ export default class CreateScreen extends React.Component<any, IState> {
             <View style={[styles.container, {marginTop: 50}]}>
               <Button
                 onPress={() => this.chooseImage()}
-                title="Pick your drawing"
+                title="Choose your drawing"
               />
             </View>
           )
