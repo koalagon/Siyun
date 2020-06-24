@@ -9,5 +9,5 @@ export default interface IPost {
   dateCreated: any;
   userId: string;
   displayName: string;
-  feedbacks: Array<IFeedback>;
+  feedback: Array<IFeedback>;
 }

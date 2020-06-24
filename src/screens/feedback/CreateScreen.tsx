@@ -18,7 +18,7 @@ interface IState {
   rating: number;
   comment: string;
   user: any;
-  feedbacks: Array<IFeedback>;
+  feedback: Array<IFeedback>;
 }
 
 export default class CreateScreen extends React.Component<any, IState> {
@@ -29,8 +29,8 @@ export default class CreateScreen extends React.Component<any, IState> {
       comment: '',
       postId: this.props.route.params.postId,
       user: firebase.auth().currentUser,
-      feedbacks: this.props.route.params.feedbacks
-        ? this.props.route.params.feedbacks
+      feedback: this.props.route.params.feedback
+        ? this.props.route.params.feedback
         : [],
     };
   }
@@ -50,11 +50,11 @@ export default class CreateScreen extends React.Component<any, IState> {
       .collection('posts')
       .doc(this.state.postId)
       .update({
-        feedbacks: firebase.firestore.FieldValue.arrayUnion(feedback),
+        feedback: firebase.firestore.FieldValue.arrayUnion(feedback),
       })
       .then(() => {
         this.setState({
-          feedbacks: [...this.state.feedbacks, feedback],
+          feedback: [...this.state.feedback, feedback],
           rating: 4,
           comment: '',
         });
@@ -86,7 +86,7 @@ export default class CreateScreen extends React.Component<any, IState> {
     return (
       <>
         <FlatList
-          data={this.state.feedbacks}
+          data={this.state.feedback}
           renderItem={({item}) => this.renderItem(item)}
           keyExtractor={(feedback) => feedback.dateCreated?._nanoseconds}
         />
@@ -101,7 +101,7 @@ export default class CreateScreen extends React.Component<any, IState> {
                 styles.feedbackInput,
                 {width: Dimensions.get('window').width - 100},
               ]}
-              placeholder="Enter your feedback"
+              placeholder="Enter your feedback..."
               value={this.state.comment}
               onChangeText={(comment) => this.setState({comment})}
             />

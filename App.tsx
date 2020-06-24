@@ -6,7 +6,7 @@ import BottomTabs from './src/components/BottomTabs';
 import Signin from './src/screens/SigninScreen';
 import Signup from './src/screens/SignupScreen';
 import Profile from './src/screens/ProfileScreen';
-import CreateFeedback from './src/screens/feedbacks/CreateScreen';
+import CreateFeedback from './src/screens/feedback/CreateScreen';
 import {firebase} from '@react-native-firebase/auth';
 
 const Stack = createStackNavigator();

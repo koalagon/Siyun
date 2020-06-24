@@ -40,7 +40,6 @@ export default class HomeScreen extends React.Component<any, IState> {
   }
 
   componentDidMount() {
-    console.log('component mounted');
     this.fetchPosts();
   }
 
@@ -66,7 +65,7 @@ export default class HomeScreen extends React.Component<any, IState> {
             dateCreated: data.dateCreated,
             displayName: data.displayName,
             userId: data.userId,
-            feedbacks: data.feedbacks,
+            feedback: data.feedback,
           };
           console.log('post: ', post);
           posts.push(post);
@@ -76,9 +75,9 @@ export default class HomeScreen extends React.Component<any, IState> {
       });
   }
 
-  feedback(postId: string, feedbacks: Array<IFeedback>) {
+  feedback(postId: string, feedback: Array<IFeedback>) {
     if (firebase.auth().currentUser) {
-      this.props.navigation.navigate('CreateFeedback', {postId, feedbacks});
+      this.props.navigation.navigate('CreateFeedback', {postId, feedback});
     } else {
       this.props.navigation.navigate('Signin');
     }
@@ -104,17 +103,17 @@ export default class HomeScreen extends React.Component<any, IState> {
             <Text style={styles.description}>{item.description}</Text>
             <TouchableOpacity
               activeOpacity={0.5}
-              onPress={() => this.feedback(item.id, item.feedbacks)}>
+              onPress={() => this.feedback(item.id, item.feedback)}>
               <View style={styles.postFooter}>
                 <View style={styles.row}>
                   <Icon name="staro" size={16} />
                   <Text style={{fontSize: 16, paddingLeft: 5, marginTop: -3}}>
-                    {item.feedbacks != null
+                    {item.feedback != null
                       ? (
-                          item.feedbacks.reduce(
+                          item.feedback.reduce(
                             (total, next) => total + next.rating,
                             0,
-                          ) / item.feedbacks.length
+                          ) / item.feedback.length
                         ).toFixed(1)
                       : 'N/A'}
                   </Text>
@@ -122,8 +121,8 @@ export default class HomeScreen extends React.Component<any, IState> {
                 <View style={styles.row}>
                   <Icon name="message1" size={16} />
                   <Text style={{fontSize: 16, paddingLeft: 5, marginTop: -3}}>
-                    {(item.feedbacks == null ? 0 : item.feedbacks.length) +
-                      ' feedbacks'}
+                    {(item.feedback == null ? 0 : item.feedback.length) +
+                      ' feedback'}
                   </Text>
                 </View>
               </View>
