@@ -3,6 +3,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Home from '../screens/HomeScreen';
 import CreatePost from '../screens/posts/CreateScreen';
 import Profile from '../screens/ProfileScreen';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,6 +20,9 @@ export default class BottomTabs extends React.Component<any> {
           component={Home}
           options={{
             tabBarLabel: 'Home',
+            tabBarIcon: () => (
+              <Icon name="home" size={24} style={{paddingTop: 5}} />
+            ),
           }}
         />
         <Tab.Screen
@@ -26,6 +30,9 @@ export default class BottomTabs extends React.Component<any> {
           component={CreatePost}
           options={{
             tabBarLabel: 'New Post',
+            tabBarIcon: () => (
+              <Icon name="pluscircle" size={24} style={{paddingTop: 5}} />
+            ),
           }}
         />
         <Tab.Screen
@@ -33,6 +40,9 @@ export default class BottomTabs extends React.Component<any> {
           component={Profile}
           options={{
             tabBarLabel: 'Profile',
+            tabBarIcon: () => (
+              <Icon name="user" size={24} style={{paddingTop: 5}} />
+            ),
           }}
         />
       </Tab.Navigator>

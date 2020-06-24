@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Text,
-  Button,
   Image,
   View,
   Dimensions,
@@ -13,6 +12,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import firestore, {firebase} from '@react-native-firebase/firestore';
 import IPost from '../models/IPost';
 import IFeedback from '../models/IFeedback';
+import Icon from 'react-native-vector-icons/AntDesign';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 interface IState {
   posts: Array<IPost>;
@@ -84,14 +85,18 @@ export default class HomeScreen extends React.Component<any, IState> {
   }
 
   renderItem(item: IPost) {
-    const padding = 15;
     const width = item.width > screenWidth ? screenWidth : item.width;
     const ratio = screenWidth / item.width;
     const height = item.width > screenWidth ? item.height * ratio : item.height;
 
     return (
       <>
-        <View style={{backgroundColor: 'white'}}>
+        <View
+          style={{
+            backgroundColor: 'white',
+            borderBottomColor: '#ddd',
+            borderBottomWidth: 15,
+          }}>
           <Text style={styles.nickname}>{item.displayName}</Text>
           <Text style={{paddingLeft: 15, paddingBottom: 10}}>
             {new Date(item.dateCreated._seconds * 1000).toISOString()}
@@ -102,29 +107,44 @@ export default class HomeScreen extends React.Component<any, IState> {
           />
           <View>
             <Text style={styles.description}>{item.description}</Text>
-            <View>
-              <Text>
-                Avg Rate:{' '}
-                {item.feedbacks != null
-                  ? (
-                      item.feedbacks.reduce(
-                        (total, next) => total + next.rating,
-                        0,
-                      ) / item.feedbacks.length
-                    ).toFixed(1)
-                  : 'N/A'}
-              </Text>
-              <Text>
-                Feedbacks: {item.feedbacks == null ? 0 : item.feedbacks.length}
-              </Text>
-              <Button
-                title="Comment & Rate"
-                onPress={() => this.feedback(item.id, item.feedbacks)}
-              />
-            </View>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              onPress={() => this.feedback(item.id, item.feedbacks)}>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  padding: 15,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  borderTopWidth: 1,
+                  borderTopColor: '#eee',
+                  marginTop: 15,
+                }}>
+                <View style={{flex: 1, flexDirection: 'row'}}>
+                  <Icon name="staro" size={16} />
+                  <Text style={{fontSize: 16, paddingLeft: 5, marginTop: -3}}>
+                    {item.feedbacks != null
+                      ? (
+                          item.feedbacks.reduce(
+                            (total, next) => total + next.rating,
+                            0,
+                          ) / item.feedbacks.length
+                        ).toFixed(1)
+                      : 'N/A'}
+                  </Text>
+                </View>
+                <View style={{flex: 1, flexDirection: 'row'}}>
+                  <Icon name="message1" size={16} />
+                  <Text style={{fontSize: 16, paddingLeft: 5, marginTop: -3}}>
+                    {(item.feedbacks == null ? 0 : item.feedbacks.length) +
+                      ' feedbacks'}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
-        <View style={{height: 15, backgroundColor: '#ddd'}}></View>
       </>
     );
   }
