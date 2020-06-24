@@ -15,7 +15,7 @@ export default class PostButton extends React.Component<IProps> {
     return (
       <TouchableOpacity
         activeOpacity={0.7}
-        onPress={() => this.props.onPress}
+        onPress={() => this.props.onPress()}
         style={styles.container}>
         <Text style={styles.text}>Post</Text>
       </TouchableOpacity>

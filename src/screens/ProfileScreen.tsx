@@ -57,7 +57,7 @@ export default class ProfileScreen extends React.Component<any, IState> {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
+    padding: 15,
     paddingTop: 30,
   },
   marginBottom15: {

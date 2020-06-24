@@ -7,6 +7,7 @@ import {
   Dimensions,
   FlatList,
   RefreshControl,
+  StyleSheet,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import firestore, {firebase} from '@react-native-firebase/firestore';
@@ -89,36 +90,42 @@ export default class HomeScreen extends React.Component<any, IState> {
     const height = item.width > screenWidth ? item.height * ratio : item.height;
 
     return (
-      <View style={{backgroundColor: 'white', marginBottom: 15}}>
-        <Text style={{padding: padding}}>{item.displayName}</Text>
-        <Image
-          source={{uri: item.imageUrl}}
-          style={{width: width, height: height}}
-        />
-        <View style={{padding: padding}}>
-          <Text>{item.description}</Text>
+      <>
+        <View style={{backgroundColor: 'white'}}>
+          <Text style={styles.nickname}>{item.displayName}</Text>
+          <Text style={{paddingLeft: 15, paddingBottom: 10}}>
+            {new Date(item.dateCreated._seconds * 1000).toISOString()}
+          </Text>
+          <Image
+            source={{uri: item.imageUrl}}
+            style={{width: width, height: height}}
+          />
           <View>
-            <Text>
-              Avg Rate:{' '}
-              {item.feedbacks != null
-                ? (
-                    item.feedbacks.reduce(
-                      (total, next) => total + next.rating,
-                      0,
-                    ) / item.feedbacks.length
-                  ).toFixed(1)
-                : 'N/A'}
-            </Text>
-            <Text>
-              Feedbacks: {item.feedbacks == null ? 0 : item.feedbacks.length}
-            </Text>
-            <Button
-              title="Comment & Rate"
-              onPress={() => this.feedback(item.id, item.feedbacks)}
-            />
+            <Text style={styles.description}>{item.description}</Text>
+            <View>
+              <Text>
+                Avg Rate:{' '}
+                {item.feedbacks != null
+                  ? (
+                      item.feedbacks.reduce(
+                        (total, next) => total + next.rating,
+                        0,
+                      ) / item.feedbacks.length
+                    ).toFixed(1)
+                  : 'N/A'}
+              </Text>
+              <Text>
+                Feedbacks: {item.feedbacks == null ? 0 : item.feedbacks.length}
+              </Text>
+              <Button
+                title="Comment & Rate"
+                onPress={() => this.feedback(item.id, item.feedbacks)}
+              />
+            </View>
           </View>
         </View>
-      </View>
+        <View style={{height: 15, backgroundColor: '#ddd'}}></View>
+      </>
     );
   }
 
@@ -147,3 +154,18 @@ export default class HomeScreen extends React.Component<any, IState> {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  nickname: {
+    padding: 10,
+    paddingLeft: 15,
+    paddingBottom: 2,
+    fontWeight: '700',
+  },
+  description: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingTop: 10,
+    fontSize: 16,
+  },
+});

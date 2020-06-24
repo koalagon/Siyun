@@ -89,11 +89,11 @@ export default class SignupScreen extends React.Component<any, IState> {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
+    padding: 15,
     paddingTop: 30,
   },
   formGroup: {
-    marginBottom: 10,
+    marginBottom: 15,
   },
   input: {
     borderRadius: 5,

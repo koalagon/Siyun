@@ -1,9 +1,18 @@
 import React from 'react';
 import {TextInput} from 'react-native-gesture-handler';
-import {Button, Text, FlatList, KeyboardAvoidingView, View} from 'react-native';
+import {
+  Text,
+  FlatList,
+  KeyboardAvoidingView,
+  View,
+  StyleSheet,
+  Dimensions,
+  Keyboard,
+} from 'react-native';
 import firestore, {firebase} from '@react-native-firebase/firestore';
 import {AirbnbRating} from 'react-native-ratings';
-import IFeedback from 'src/models/IFeedback';
+import IFeedback from '../../models/IFeedback';
+import PostButton from '../../components/PostButton';
 
 interface IState {
   postId: string;
@@ -28,6 +37,8 @@ export default class CreateScreen extends React.Component<any, IState> {
   }
 
   saveFeedback() {
+    console.log('saveFeedback');
+
     const feedback = {
       rating: this.state.rating,
       comment: this.state.comment,
@@ -42,26 +53,38 @@ export default class CreateScreen extends React.Component<any, IState> {
       .update({
         feedbacks: firebase.firestore.FieldValue.arrayUnion(feedback),
       })
-      .then(() =>
+      .then(() => {
         this.setState({
           feedbacks: [...this.state.feedbacks, feedback],
           rating: 4,
           comment: '',
-        }),
-      );
+        });
+        Keyboard.dismiss();
+      });
   }
 
   renderItem(item: IFeedback) {
     return (
       <>
-        <View style={{padding: 10}}>
-          <Text>{item.displayName}</Text>
-          <Text>
-            {item.dateCreated
-              ? new Date(item.dateCreated?._seconds * 1000).toString()
-              : 'N/A'}
-          </Text>
-          <Text>{item.rating}</Text>
+        <View
+          style={{
+            borderBottomColor: '#eee',
+            borderBottomWidth: 1,
+            paddingBottom: 7,
+            paddingTop: 7,
+            paddingLeft: 15,
+            paddingRight: 15,
+          }}>
+          <View style={styles.row}>
+            <Text style={{fontWeight: '700'}}>{item.displayName}</Text>
+            <AirbnbRating
+              defaultRating={item.rating}
+              isDisabled={true}
+              showRating={false}
+              size={14}
+              starContainerStyle={{paddingLeft: 10}}
+            />
+          </View>
           <Text>{item.comment}</Text>
         </View>
       </>
@@ -76,21 +99,44 @@ export default class CreateScreen extends React.Component<any, IState> {
           renderItem={({item}) => this.renderItem(item)}
           keyExtractor={(feedback) => feedback.dateCreated?._nanoseconds}
         />
-        <KeyboardAvoidingView>
+        <View style={styles.container}>
           <AirbnbRating
             defaultRating={this.state.rating}
             onFinishRating={(rating) => this.setState({rating})}
           />
-          <TextInput
-            multiline={true}
-            numberOfLines={4}
-            placeholder="Enter your feedback"
-            value={this.state.comment}
-            onChangeText={(comment) => this.setState({comment})}
-          />
-        </KeyboardAvoidingView>
-        <Button title="Save Changes" onPress={() => this.saveFeedback()} />
+          <View style={[styles.row, styles.marginTop15]}>
+            <TextInput
+              style={[
+                styles.feedbackInput,
+                {width: Dimensions.get('window').width - 100},
+              ]}
+              placeholder="Enter your feedback"
+              value={this.state.comment}
+              onChangeText={(comment) => this.setState({comment})}
+            />
+            <PostButton onPress={() => this.saveFeedback()} />
+          </View>
+        </View>
       </>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 15,
+  },
+  row: {
+    flexDirection: 'row',
+  },
+  marginTop15: {
+    marginTop: 15,
+  },
+  feedbackInput: {
+    borderColor: '#eee',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingTop: 5,
+    paddingBottom: 5,
+  },
+});

@@ -143,7 +143,7 @@ export default class CreateScreen extends React.Component<any, IState> {
                   }}
                   source={{uri: this.state.imagePath}}
                 />
-                <View style={[styles.padding10, styles.marginTop15]}>
+                <View style={[styles.container]}>
                   <SegmentedControlTab
                     values={['Public', 'Private']}
                     selectedIndex={this.state.selectedIndex}
@@ -159,7 +159,7 @@ export default class CreateScreen extends React.Component<any, IState> {
                       value={this.state.description}
                       style={[
                         styles.descInput,
-                        {width: this.state.screenWidth - 90},
+                        {width: this.state.screenWidth - 100},
                       ]}
                     />
                     <PostButton
@@ -170,7 +170,7 @@ export default class CreateScreen extends React.Component<any, IState> {
               </ScrollView>
             </SafeAreaView>
           ) : (
-            <View style={[styles.padding10, {marginTop: 50}]}>
+            <View style={[styles.container, {marginTop: 50}]}>
               <Button
                 onPress={() => this.chooseImage()}
                 title="Pick your drawing"
@@ -197,7 +197,7 @@ export default class CreateScreen extends React.Component<any, IState> {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
+    padding: 15,
     paddingTop: 30,
   },
   row: {
